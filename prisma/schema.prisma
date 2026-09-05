@@ -1,0 +1,383 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["base_cat"]
+}
+
+model Rol {
+  id                  Int       @id @default(autoincrement())
+  nombre              String?   @db.VarChar(255)
+  codigo              String?   @db.VarChar(255)
+  descripcion         String?   @db.VarChar(255)
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  usuarios            User[]
+
+  @@map("roles")
+  @@schema("base_cat")
+}
+
+model Permiso {
+  id                  Int       @id @default(autoincrement())
+  nombre              String?   @db.VarChar(255)
+  codigo              String?   @db.VarChar(255)
+  modulo              String?   @db.VarChar(255)
+  descripcion         String?   @db.VarChar(255)
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  permisosUsuario     PermisoUsuario[]
+
+  @@map("permisos")
+  @@schema("base_cat")
+}
+
+model PermisoUsuario {
+  id                  Int       @id @default(autoincrement())
+  usuarioId           Int?      @map("usuario_id")
+  permisoId           Int?      @map("permiso_id")
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  usuario             User?     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  permiso             Permiso?  @relation(fields: [permisoId], references: [id], onDelete: Cascade)
+
+  @@map("permiso_usuario")
+  @@schema("base_cat")
+}
+
+model Sucursal {
+  id                  Int       @id @default(autoincrement())
+  nombre              String?   @db.VarChar(255)
+  direccion           String?   @db.VarChar(255)
+  telefono            String?   @db.VarChar(255)
+  esPrincipal         Boolean?  @default(false) @map("es_principal")
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  usuarios            User[]
+  cajas               Caja[]
+  ventas              Venta[]
+  productoSucursales  ProductoSucursal[]
+  movimientosInventario MovimientoInventario[]
+
+  @@map("sucursales")
+  @@schema("base_cat")
+}
+
+model User {
+  id                  Int       @id @default(autoincrement())
+  name                String?   @db.VarChar(255)
+  nombres             String?   @db.VarChar(255)
+  apellidoPaterno     String?   @map("apellido_paterno") @db.VarChar(255)
+  apellidoMaterno     String?   @map("apellido_materno") @db.VarChar(255)
+  cedula              String?   @db.VarChar(255)
+  telefono            String?   @db.VarChar(255)
+  direccion           String?   @db.VarChar(255)
+  email               String?   @unique @db.VarChar(255)
+  emailVerifiedAt     DateTime? @map("email_verified_at")
+  password            String?   @db.VarChar(255)
+  rolId               Int?      @map("rol_id")
+  sucursalId          Int?      @map("sucursal_id")
+  estado              Boolean?  @default(true)
+  rememberToken       String?   @map("remember_token") @db.VarChar(100)
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  rol                 Rol?      @relation(fields: [rolId], references: [id], onDelete: SetNull)
+  sucursal            Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
+  permisosUsuario     PermisoUsuario[]
+  cajas               Caja[]
+  ventas              Venta[]
+
+  @@map("users")
+  @@schema("base_cat")
+}
+
+model Cliente {
+  id                  Int       @id @default(autoincrement())
+  nombreRazonSocial   String?   @map("nombre_razon_social") @db.VarChar(255)
+  cedulaNitRuc        String?   @map("cedula_nit_ruc") @db.VarChar(255)
+  telefono            String?   @db.VarChar(255)
+  email               String?   @db.VarChar(255)
+  direccion           String?   @db.VarChar(255)
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  ventas              Venta[]
+
+  @@map("clientes")
+  @@schema("base_cat")
+}
+
+model Proveedor {
+  id                  Int       @id @default(autoincrement())
+  nombreEmpresa       String?   @map("nombre_empresa") @db.VarChar(255)
+  contactoNombre      String?   @map("contacto_nombre") @db.VarChar(255)
+  nitRuc              String?   @map("nit_ruc") @db.VarChar(255)
+  telefono            String?   @db.VarChar(255)
+  email               String?   @db.VarChar(255)
+  direccion           String?   @db.VarChar(255)
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  productos           Producto[]
+
+  @@map("proveedores")
+  @@schema("base_cat")
+}
+
+model Categoria {
+  id                  Int       @id @default(autoincrement())
+  nombre              String?   @db.VarChar(255)
+  descripcion         String?   @db.VarChar(255)
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  productos           Producto[]
+
+  @@map("categorias")
+  @@schema("base_cat")
+}
+
+model Marca {
+  id                  Int       @id @default(autoincrement())
+  nombre              String?   @db.VarChar(255)
+  descripcion         String?   @db.VarChar(255)
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  productos           Producto[]
+
+  @@map("marcas")
+  @@schema("base_cat")
+}
+
+model Producto {
+  id                  Int       @id @default(autoincrement())
+  codigoBarras        String?   @map("codigo_barras") @db.VarChar(255)
+  sku                 String?   @db.VarChar(255)
+  nombre              String?   @db.VarChar(255)
+  descripcion         String?   @db.Text
+  categoriaId         Int?      @map("categoria_id")
+  marcaId             Int?      @map("marca_id")
+  proveedorId         Int?      @map("proveedor_id")
+  precioCompra        Decimal?  @default(0.00) @map("precio_compra") @db.Decimal(12, 2)
+  precioVenta         Decimal?  @default(0.00) @map("precio_venta") @db.Decimal(12, 2)
+  stockMinimo         Decimal?  @default(5.00) @map("stock_minimo") @db.Decimal(12, 2)
+  unidadMedida        String?   @default("UNIDAD") @map("unidad_medida") @db.VarChar(255)
+  imagen              String?   @db.VarChar(255)
+  estado              Boolean?  @default(true)
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  categoria           Categoria? @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
+  marca               Marca?     @relation(fields: [marcaId], references: [id], onDelete: SetNull)
+  proveedor           Proveedor? @relation(fields: [proveedorId], references: [id], onDelete: SetNull)
+  productoSucursales  ProductoSucursal[]
+  movimientosInventario MovimientoInventario[]
+  detalleVentas       DetalleVenta[]
+
+  @@map("productos")
+  @@schema("base_cat")
+}
+
+model ProductoSucursal {
+  id                  Int       @id @default(autoincrement())
+  productoId          Int?      @map("producto_id")
+  sucursalId          Int?      @map("sucursal_id")
+  stockActual         Decimal?  @default(0.00) @map("stock_actual") @db.Decimal(12, 2)
+  ubicacionAlmacen    String?   @map("ubicacion_almacen") @db.VarChar(255)
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  producto            Producto? @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  sucursal            Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: Cascade)
+
+  @@map("producto_sucursal")
+  @@schema("base_cat")
+}
+
+model MovimientoInventario {
+  id                  Int       @id @default(autoincrement())
+  sucursalId          Int?      @map("sucursal_id")
+  productoId          Int?      @map("producto_id")
+  tipoMovimiento      String?   @map("tipo_movimiento") @db.VarChar(255)
+  cantidad            Decimal?  @db.Decimal(12, 2)
+  precioCompra        Decimal?  @map("precio_compra") @db.Decimal(12, 2)
+  precioVenta         Decimal?  @map("precio_venta") @db.Decimal(12, 2)
+  stockAnterior       Decimal?  @map("stock_anterior") @db.Decimal(12, 2)
+  stockNuevo          Decimal?  @map("stock_nuevo") @db.Decimal(12, 2)
+  motivo              String?   @db.VarChar(255)
+  referenciaTipo      String?   @map("referencia_tipo") @db.VarChar(255)
+  referenciaId        Int?      @map("referencia_id")
+  fechaMovimiento     DateTime? @map("fecha_movimiento")
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  sucursal            Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
+  producto            Producto? @relation(fields: [productoId], references: [id], onDelete: SetNull)
+
+  @@map("movimientos_inventario")
+  @@schema("base_cat")
+}
+
+model Caja {
+  id                  Int       @id @default(autoincrement())
+  sucursalId          Int?      @map("sucursal_id")
+  usuarioId           Int?      @map("usuario_id")
+  montoApertura       Decimal?  @map("monto_apertura") @db.Decimal(12, 2)
+  montoCierre         Decimal?  @map("monto_cierre") @db.Decimal(12, 2)
+  ventasEfectivo      Decimal?  @default(0.00) @map("ventas_efectivo") @db.Decimal(12, 2)
+  ventasDigital       Decimal?  @default(0.00) @map("ventas_digital") @db.Decimal(12, 2)
+  totalEsperado       Decimal?  @map("total_esperado") @db.Decimal(12, 2)
+  diferencia          Decimal?  @map("diferencia") @db.Decimal(12, 2)
+  estado              String?   @default("ABIERTA") @db.VarChar(255)
+  fechaApertura       DateTime? @map("fecha_apertura")
+  fechaCierre         DateTime? @map("fecha_cierre")
+  observaciones       String?   @db.Text
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  sucursal            Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
+  usuario             User?     @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  ventas              Venta[]
+  pagos               Pago[]
+
+  @@map("cajas")
+  @@schema("base_cat")
+}
+
+model Venta {
+  id                  Int       @id @default(autoincrement())
+  numeroRecibo        String?   @map("numero_recibo") @db.VarChar(255)
+  sucursalId          Int?      @map("sucursal_id")
+  cajaId              Int?      @map("caja_id")
+  usuarioId           Int?      @map("usuario_id")
+  clienteId           Int?      @map("cliente_id")
+  subtotal            Decimal?  @db.Decimal(12, 2)
+  descuentoGeneral    Decimal?  @default(0.00) @map("descuento_general") @db.Decimal(12, 2)
+  total               Decimal?  @db.Decimal(12, 2)
+  montoPagado         Decimal?  @map("monto_pagado") @db.Decimal(12, 2)
+  cambio              Decimal?  @default(0.00) @db.Decimal(12, 2)
+  metodoPagoPrincipal String?   @map("metodo_pago_principal") @db.VarChar(255)
+  estado              String?   @default("COMPLETADA") @db.VarChar(255)
+  fechaVenta          DateTime? @map("fecha_venta")
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  sucursal            Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
+  caja                Caja?     @relation(fields: [cajaId], references: [id], onDelete: SetNull)
+  usuario             User?     @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  cliente             Cliente?  @relation(fields: [clienteId], references: [id], onDelete: SetNull)
+  detalles            DetalleVenta[]
+  pagos               Pago[]
+
+  @@map("ventas")
+  @@schema("base_cat")
+}
+
+model DetalleVenta {
+  id                  Int       @id @default(autoincrement())
+  ventaId             Int?      @map("venta_id")
+  productoId          Int?      @map("producto_id")
+  cantidad            Decimal?  @db.Decimal(12, 2)
+  precioUnitario      Decimal?  @map("precio_unitario") @db.Decimal(12, 2)
+  descuentoUnitario   Decimal?  @default(0.00) @map("descuento_unitario") @db.Decimal(12, 2)
+  subtotal            Decimal?  @db.Decimal(12, 2)
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  venta               Venta?    @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  producto            Producto? @relation(fields: [productoId], references: [id], onDelete: SetNull)
+
+  @@map("detalle_ventas")
+  @@schema("base_cat")
+}
+
+model Pago {
+  id                  Int       @id @default(autoincrement())
+  ventaId             Int?      @map("venta_id")
+  cajaId              Int?      @map("caja_id")
+  metodoPago          String?   @map("metodo_pago") @db.VarChar(255)
+  monto               Decimal?  @db.Decimal(12, 2)
+  referenciaTransaccion String? @map("referencia_transaccion") @db.VarChar(255)
+  fechaPago           DateTime? @map("fecha_pago")
+  usuarioCreadorId    Int?      @map("usuario_creador_id")
+  usuarioModificadorId Int?     @map("usuario_modificador_id")
+  usuarioEliminadorId  Int?     @map("usuario_eliminador_id")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  venta               Venta?    @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  caja                Caja?     @relation(fields: [cajaId], references: [id], onDelete: SetNull)
+
+  @@map("pagos")
+  @@schema("base_cat")
+}
