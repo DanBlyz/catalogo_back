@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { UsersModule } from './users/users.module.js';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
 import { ClientesModule } from './clientes/clientes.module.js';
+import { MarcasModule } from './marcas/marcas.module.js';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ClientesModule } from './clientes/clientes.module.js';
     AuthModule,
     UsersModule,
     ClientesModule,
+    MarcasModule,
   ],
   controllers: [AppController],
   providers: [
