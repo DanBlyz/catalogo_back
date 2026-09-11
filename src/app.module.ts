@@ -9,6 +9,10 @@ import { UsersModule } from './users/users.module.js';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
 import { ClientesModule } from './clientes/clientes.module.js';
 import { MarcasModule } from './marcas/marcas.module.js';
+import { CategoriasModule } from './categorias/categorias.module.js';
+import { ProveedoresModule } from './proveedores/proveedores.module.js';
+import { SucursalesModule } from './sucursales/sucursales.module.js';
+import { ProductosModule } from './productos/productos.module.js';
 
 @Module({
   imports: [
@@ -20,6 +24,10 @@ import { MarcasModule } from './marcas/marcas.module.js';
     UsersModule,
     ClientesModule,
     MarcasModule,
+    CategoriasModule,
+    ProveedoresModule,
+    SucursalesModule,
+    ProductosModule,
   ],
   controllers: [AppController],
   providers: [
